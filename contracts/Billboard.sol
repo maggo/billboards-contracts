@@ -15,7 +15,6 @@ contract Billboard is Initializable, OwnableUpgradeable, ERC721Upgradeable {
 
     mapping(uint256 tokenId => uint256) public minimumPrices;
     mapping(uint256 tokenId => uint256) public currentPrices;
-    mapping(uint256 tokenId => address) public lastBuyers;
     mapping(uint256 tokenId => SlotMetadata) public slotMetadata;
 
     uint256 public minimumPriceIncrement;
@@ -59,7 +58,7 @@ contract Billboard is Initializable, OwnableUpgradeable, ERC721Upgradeable {
             "Value must be more than the current price plus the minimum increment"
         );
 
-        address previousBuyer = lastBuyers[_tokenId];
+        address previousBuyer = ownerOf(_tokenId);
 
         if (previousBuyer == address(0)) {
             previousBuyer = owner();
@@ -81,9 +80,6 @@ contract Billboard is Initializable, OwnableUpgradeable, ERC721Upgradeable {
 
         // Transfer the NFT
         _transfer(ownerOf(_tokenId), _receiver, _tokenId);
-
-        // Set last buyer
-        lastBuyers[_tokenId] = _receiver;
 
         // Reset slot metadata
         slotMetadata[_tokenId] = SlotMetadata("", "");
@@ -112,7 +108,7 @@ contract Billboard is Initializable, OwnableUpgradeable, ERC721Upgradeable {
             '"image": "',
             slotMetadata[_tokenId].imageURI,
             '",',
-            '"external_url: "',
+            '"external_url": "',
             slotMetadata[_tokenId].url,
             '",',
             "}"
