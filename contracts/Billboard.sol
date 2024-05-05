@@ -18,6 +18,7 @@ contract Billboard is Initializable, OwnableUpgradeable, ERC721Upgradeable {
     mapping(uint256 tokenId => SlotMetadata) public slotMetadata;
 
     uint256 public minimumPriceIncrement;
+    string public image;
 
     constructor() {
         _disableInitializers();
@@ -27,12 +28,14 @@ contract Billboard is Initializable, OwnableUpgradeable, ERC721Upgradeable {
         address owner_,
         string memory name_,
         string memory symbol_,
+        string memory image_,
         uint256 minimumPrice_,
         uint256 minimumPriceIncrement_
     ) public initializer {
         __Ownable_init(owner_);
         __ERC721_init(name_, symbol_);
 
+        image = image_;
         minimumPriceIncrement = minimumPriceIncrement_;
 
         // Mint the 9 slot NFTs
@@ -98,7 +101,32 @@ contract Billboard is Initializable, OwnableUpgradeable, ERC721Upgradeable {
         slotMetadata[_tokenId] = SlotMetadata(_imageURI, _url);
     }
 
-    function getTokenURI(uint256 _tokenId) public view returns (string memory) {
+    function contractURI() public view returns (string memory) {
+        bytes memory dataURI = abi.encodePacked(
+            "{",
+            '"name": "',
+            name(),
+            '",',
+            '"image": "',
+            image,
+            '",',
+            '"external_link": "https://billboards.cool/',
+            Strings.toHexString(address(this)),
+            '"'
+            "}"
+        );
+        return
+            string(
+                abi.encodePacked(
+                    "data:application/json;base64,",
+                    Base64.encode(dataURI)
+                )
+            );
+    }
+
+    function tokenURI(
+        uint256 _tokenId
+    ) public view override returns (string memory) {
         bytes memory dataURI = abi.encodePacked(
             "{",
             '"name": "Billboard Slot #',
@@ -110,7 +138,7 @@ contract Billboard is Initializable, OwnableUpgradeable, ERC721Upgradeable {
             '",',
             '"external_url": "',
             slotMetadata[_tokenId].url,
-            '",',
+            '"',
             "}"
         );
         return

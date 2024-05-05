@@ -33,6 +33,7 @@ describe("Billboard", () => {
     const exampleBillboardDeployTx = await billboardFactory.write.create([
       "Example Billboard",
       "EXMPL",
+      "ipfs://asdf",
       parseEther("0.1"),
       parseEther("0.1"),
     ]);
@@ -73,6 +74,26 @@ describe("Billboard", () => {
       expect(await exampleBillboard.read.getPrice([0n])).to.equal(
         parseEther("0.1")
       );
+    });
+
+    it("Should have valid metadata", async function () {
+      const { exampleBillboard } = await loadFixture(deployBillboardFixture);
+
+      const contractData = await exampleBillboard.read.contractURI();
+      expect(JSON.parse(atob(contractData.split(",")[1]))).to.be.deep.equal({
+        name: "Example Billboard",
+        image: "ipfs://asdf",
+        external_link:
+          "https://billboards.cool/0xacdf1454e665cf8023769aeb4191892b3aaa90b5",
+      });
+
+      const tokenData = await exampleBillboard.read.tokenURI([0n]);
+      expect(JSON.parse(atob(tokenData.split(",")[1]))).to.be.deep.equal({
+        description: "An NFT representing a slot in this billboard.",
+        external_url: "",
+        image: "",
+        name: "Billboard Slot #0",
+      });
     });
   });
 });

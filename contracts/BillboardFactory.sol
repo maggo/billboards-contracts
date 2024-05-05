@@ -59,6 +59,7 @@ contract BillboardFactory is UUPSUpgradeable, AccessControlUpgradeable {
     function create(
         string memory name_,
         string memory symbol_,
+        string memory image_,
         uint256 minimumPrice_,
         uint256 minimumPriceIncrement_
     ) external returns (address) {
@@ -75,6 +76,7 @@ contract BillboardFactory is UUPSUpgradeable, AccessControlUpgradeable {
             owner_: msg.sender,
             name_: name_,
             symbol_: symbol_,
+            image_: image_,
             minimumPrice_: minimumPrice_,
             minimumPriceIncrement_: minimumPriceIncrement_
         });
